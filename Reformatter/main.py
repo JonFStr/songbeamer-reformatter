@@ -46,7 +46,7 @@ def parse(filename):
             parse(filename + '/' + subfile) #appending current filename for not having to change the working directory
     elif os.path.isfile(filename):
         with open(filename, 'r+', encoding=determineCharset(filename)) as f:
-            print(format(f.read()))
+            f.write(format(f.read()))
     else:
         raise FileNotFoundError
 
