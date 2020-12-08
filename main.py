@@ -24,7 +24,7 @@ def formatLine(line):
     #Make character at line start uppercase
     line = re.sub(r'^\s*(#\d)?\s+([a-z])', lambda mobj: mobj.group(2).upper(), line) #Line start to upper case
     line = re.sub(r'[^\w\-"]$', r'', line) #Line end remove Symbols except quotes and dashes
-    line = re.sub(r'[\'`]', r'\'', line) #Replace accents with apostrophes
+    line = re.sub(r'[\'`´]', r'\'', line) #Replace accents with apostrophes
     return line
 
 def format(text):
