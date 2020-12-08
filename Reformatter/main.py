@@ -1,12 +1,13 @@
-import argparse
-import os
-import re
-import magic #Get Encoding of File
+import argparse, os, re, chardet
 
 #Parsing CMD arguments
 argparser = argparse.ArgumentParser(description='Reformat *.sng files to the standard Immanuel format.')
 # input files
 argparser.add_argument('files', nargs='+', help='Files to be reformatted. If directory, all *.sng files in it will be reformatted recursively.')
+# output directory
+argparser.add_argument('-o', '--output-directory', dest='out', help='Write files in this output directory instead of overwriting input files. Keeps directory structure')
+# parse the args now to avoid unneeded execution of code
+args = argparser.parse_args()
 
 def cleanup(text):
     result = text
@@ -43,19 +44,27 @@ def format(text):
         result += formatLine(line) + '\n'
     return result
 
-def determineCharset(filename):
-    m = magic.Magic(mime_encoding = True)
-    return m.from_file(filename)
-
-def parse(filename):
+def parse(filename, outdir):
     if os.path.isdir(filename):     #if directory, parse subcontents recursively
-        for subfile in os.listdir(filename):
-            parse(filename + '/' + subfile) #appending current filename for not having to change the working directory
+        if outdir and not os.path.isdir(os.path.join(outdir, filename)): # if outdir is given and the directory does not exist in outdir, create it
+            os.makedirs(os.path.join(outdir, filename))
+        for subfile in os.listdir(filename): # recursively call parse for subdirectories
+            parse(filename + '/' + subfile, outdir) #appending current filename for not having to change the working directory
     elif os.path.isfile(filename):
-        with open(filename, 'r+', encoding=determineCharset(filename)) as f:
-            f.write(format(f.read()))
+        raw = None
+        with open(filename, 'rb') as infile: # open binary content to determine encoding later
+            raw = infile.read()
+        formatted = format(raw.decode(chardet.detect(raw)['encoding'])) # format decoded string (prevents empty files on error)
+        with open(os.path.join(outdir, filename), 'w') as outfile: # open file for writin (if necessary with outdir)
+            outfile.write(formatted) # write out
     else:
         raise FileNotFoundError
 
-for filename in argparser.parse_args().files:
-    parse(filename)
+# Set outdir
+outdir = ''
+if args.out:
+    outdir = args.out
+
+# Start parsing of files
+for filename in args.files:
+    parse(filename, outdir)
