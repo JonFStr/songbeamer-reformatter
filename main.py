@@ -38,7 +38,7 @@ def formatLine(line):
                   lambda mobj: mobj.group(2).upper(), line)
     # Line end remove Symbols except quotes and dashes
     line = re.sub(r'[^\w\-"]$', r'', line)
-    line = re.sub(r'[\'`]', r'\'', line)  # Replace accents with apostrophes
+    line = re.sub(r'[\'`´]', r'\'', line)  # Replace accents with apostrophes
     return line
 
 
