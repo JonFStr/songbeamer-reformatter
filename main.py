@@ -70,23 +70,39 @@ def format(text):
 
 
 def parse(filename, outdir):
+    basename = os.path.basename(filename)
+    if not basename:
+        basename = os.path.basename(filename[:-1])
+
     if os.path.isdir(filename):  # if directory, parse subcontents recursively
-        # if out is given and the directory does not exist in outdir, create it
-        if outdir and not os.path.isdir(os.path.join(outdir, filename)):
-            os.makedirs(os.path.join(outdir, filename))
+        # create directory structure in outdir if present
+        if outdir:
+            os.makedirs(os.path.join(outdir, basename), exist_ok=True)
+
         # recursively call parse for subdirectories
         for subfile in os.listdir(filename):
             # appending current filename -> don't change the working directory
-            parse(filename + '/' + subfile, outdir)
+            parse(os.path.join(filename, subfile),
+                  os.path.join(outdir, basename))
+
     elif os.path.isfile(filename):
         raw = None
         with open(filename, 'rb') as infile:  # open binary -> encoding later
             raw = infile.read()
+
         # format decoded string (prevents empty files on error)
         formatted = format(raw.decode(chardet.detect(raw)['encoding']))
-        # open file for writin (if necessary with outdir)
-        with open(os.path.join(outdir, filename), 'w') as outfile:
+
+        outfilename = filename
+        # if out is given and the directory does not exist in outdir, create it
+        if outdir:
+            # this file belongs in a subdir
+            outfilename = os.path.join(outdir, basename)
+
+        # open file for writing (if necessary with outdir)
+        with open(outfilename, 'w') as outfile:
             outfile.write(formatted)  # write out
+
     else:
         raise FileNotFoundError
 
@@ -95,6 +111,13 @@ def parse(filename, outdir):
 outdir = ''
 if args.out:
     outdir = args.out
+
+# if the file already exists and is not a directory, throw error
+if os.path.exists(outdir) and not os.path.isdir(outdir):
+    raise FileExistsError
+else:
+    # otherwise create the dir
+    os.makedirs(outdir, exist_ok=True)
 
 # Start parsing of files
 for filename in args.files:
