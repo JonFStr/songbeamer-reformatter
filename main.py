@@ -99,6 +99,13 @@ def parse(filename, outdir):
             # this file belongs in a subdir
             outfilename = os.path.join(outdir, basename)
 
+        # if the file already exists, make it's filename the full filename
+        i = 1
+        pattern = outfilename[:-4] + r' ({})' + outfilename[-4:]
+        while os.path.exists(outfilename):
+            outfilename = pattern.format(i)
+            i += 1
+
         # open file for writing (if necessary with outdir)
         with open(outfilename, 'w') as outfile:
             outfile.write(formatted)  # write out
