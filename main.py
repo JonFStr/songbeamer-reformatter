@@ -30,7 +30,7 @@ def cleanup(text):
     # Fix only 2 dashes for slide separation
     result = re.sub(r'\n--\n', r'\n---\n', result)
     # Remove empty slides
-    result = re.sub(r'\n---\n---\n', r'\n---\n', result
+    result = re.sub(r'\n---\n---\n', r'\n---\n', result)
     # Remove slide seperator at eof
     result = re.sub(r'\n---\n$', r'\n', result)
     return result
