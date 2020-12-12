@@ -86,6 +86,11 @@ def parse(filename, outdir):
                   os.path.join(outdir, basename))
 
     elif os.path.isfile(filename):
+        # file must be .sng
+        if not filename.endswith('.sng'):
+            return
+
+        # read file contents
         raw = None
         with open(filename, 'rb') as infile:  # open binary -> encoding later
             raw = infile.read()
@@ -93,6 +98,7 @@ def parse(filename, outdir):
         # format decoded string (prevents empty files on error)
         formatted = format(raw.decode(chardet.detect(raw)['encoding']))
 
+        # determine output filename
         outfilename = filename
         # if out is given and the directory does not exist in outdir, create it
         if outdir:
