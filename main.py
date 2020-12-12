@@ -69,6 +69,8 @@ def format(text):
     return result
 
 
+# filename: The current file to be examined
+# outdir: The output directory where to put the reformatted file
 def parse(filename, outdir):
     basename = os.path.basename(filename)
     if not basename:
@@ -76,15 +78,14 @@ def parse(filename, outdir):
 
     # If directory, parse subcontents recursively
     if os.path.isdir(filename):
-        # Create directory structure in outdir if present
+        # If custom out given, append this directory to it
         if outdir:
-            os.makedirs(os.path.join(outdir, basename), exist_ok=True)
+            outdir = os.path.join(outdir, basename)
 
         # Recursively call parse for dir contents
         for subfile in os.listdir(filename):
             # Appending current filename -> don't change the working directory
-            parse(os.path.join(filename, subfile),
-                  os.path.join(outdir, basename))
+            parse(os.path.join(filename, subfile), outdir)
 
     elif os.path.isfile(filename):
         # File must be .sng
@@ -102,19 +103,22 @@ def parse(filename, outdir):
 
         # Determine output filename
         outfilename = filename
-        # If out is given and the directory does not exist in outdir, create it
+        # if custom out is given, put it in there
         if outdir:
             # This file belongs in a subdir
             outfilename = os.path.join(outdir, basename)
+            # If the file already exists in custom outdir, append number
+            i = 1
+            # Pattern to insert number before .sng
+            pattern = outfilename[:-4] + r' ({})' + outfilename[-4:]
+            while os.path.exists(outfilename):
+                outfilename = pattern.format(i)
+                i += 1
 
-        # If the file already exists, make it's filename the full filename
-        i = 1
-        pattern = outfilename[:-4] + r' ({})' + outfilename[-4:]
-        while os.path.exists(outfilename):
-            outfilename = pattern.format(i)
-            i += 1
+        # Create needed directories for this file
+        os.makedirs(os.path.basename(outfilename), exist_ok=True)
 
-        # Open file for writing (if necessary with outdir)
+        # Write formatted file
         with open(outfilename, 'w') as outfile:
             outfile.write(formatted)
 
