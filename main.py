@@ -23,11 +23,19 @@ args = argparser.parse_args()
 def cleanup(text):
     result = text
     result = re.sub(r'\n\s*\n', r'\n', result)  # Remove empty lines
+
+    # Replace all unicode space characters with the default space
+    # pattern: All horizontal whitespace characters except space
+    result = re.sub(r'[^\S\n\v\f\r\u2028\u2029 ]', r' ', result)
+
     # Fix only 2 dashes for slide separation
     result = re.sub(r'\n--\n', r'\n---\n', result)
+
     result = re.sub(r'\n---\n---\n', r'\n---\n', result)  # Remove empty slides
+
     # remove slide seperator at eof
     result = re.sub(r'\n---\n$', r'\n', result)
+
     return result
 
 
