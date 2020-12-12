@@ -116,7 +116,7 @@ def parse(filename, outdir):
 
         # Open file for writing (if necessary with outdir)
         with open(outfilename, 'w') as outfile:
-            outfile.write(formatted)  # write out
+            outfile.write(formatted)
 
     else:
         raise FileNotFoundError
@@ -127,11 +127,11 @@ outdir = ''
 if args.out:
     outdir = args.out
 
-# if the file already exists and is not a directory, throw error
+# If the file already exists and is not a directory, throw error
 if os.path.exists(outdir) and not os.path.isdir(outdir):
     raise FileExistsError
 else:
-    # otherwise create the dir
+    # Otherwise create the dir
     os.makedirs(outdir, exist_ok=True)
 
 # Start parsing of files
