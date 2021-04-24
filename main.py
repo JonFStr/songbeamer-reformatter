@@ -72,6 +72,10 @@ def format(text):
 # filename: The current file to be examined
 # outdir: The output directory where to put the reformatted file
 def parse(filename, outdir):
+    # status line (first sequence moves cursor up)
+    print('\x1b[1A', 'Parsing:', filename, end='\x1b[K'+'\n')
+
+    # set the basename (not found by function if string ands with /)
     basename = os.path.basename(filename)
     if not basename:
         basename = os.path.basename(filename[:-1])
@@ -138,6 +142,8 @@ else:
     # Otherwise create the dir
     os.makedirs(outdir, exist_ok=True)
 
+# one empty line to let the cursor move up in the status line
+print()
 # Start parsing of files
 for filename in args.files:
     parse(filename, outdir)
