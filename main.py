@@ -19,6 +19,10 @@ argparser.add_argument(
 # Parse the args now to avoid unneeded execution of code
 args = argparser.parse_args()
 
+# ANSI control sequences
+ctrl_clearLine = '\x1b[K'
+ctrl_moveUp = '\x1b[1A'
+
 
 def cleanup(text):
     result = text
@@ -69,11 +73,21 @@ def format(text):
     return result
 
 
-# filename: The current file to be examined
-# outdir: The output directory where to put the reformatted file
 def parse(filename, outdir):
+    global fileCounter, fileSum
+
     # status line (first sequence moves cursor up)
-    print('\x1b[1A', 'Parsing:', filename, end='\x1b[K'+'\n')
+    fileCounter += 1
+
+    # number of files over total files and percentage
+    stats = f'{{count: {len(str(fileSum))},}} of {fileSum:,} ({{percent}}%)'
+    stats = stats.format(count=fileCounter,
+                         percent=round(fileCounter/fileSum*100)
+                         if fileSum != 0 else 0)
+
+    # print rewriting status line
+    print(ctrl_moveUp + 'Reformatting:', stats, filename,
+          end=ctrl_clearLine+'\n')
 
     # set the basename (not found by function if string ands with /)
     basename = os.path.basename(filename)
@@ -87,7 +101,9 @@ def parse(filename, outdir):
             outdir = os.path.join(outdir, basename)
 
         # Recursively call parse for dir contents
-        for subfile in os.listdir(filename):
+        subfiles = os.listdir(filename)
+        fileSum += len(subfiles)  # update total sum of files
+        for subfile in subfiles:
             # Appending current filename -> don't change the working directory
             parse(os.path.join(filename, subfile), outdir)
 
@@ -144,6 +160,11 @@ else:
 
 # one empty line to let the cursor move up in the status line
 print()
+
+# set initial file sum for status line
+fileSum = len(args.files)
+fileCounter = 0
+
 # Start parsing of files
 for filename in args.files:
     parse(filename, outdir)
