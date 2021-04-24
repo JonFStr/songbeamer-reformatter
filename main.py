@@ -112,14 +112,23 @@ def parse(filename, outdir):
         if not filename.endswith('.sng'):
             return
 
-        # Read file contents
-        raw = None
         # Open binary -> encoding later
         with open(filename, 'rb') as infile:
             raw = infile.read()
 
+        # decode string
+        try:
+            encoding = chardet.detect(raw)['encoding']
+            if not encoding:
+                raise ValueError('Cannot detect matching encoding')
+            contents = raw.decode(encoding)
+        except ValueError as err:
+            print(ctrl_moveUp + 'Error decoding file "' + filename + '":', err,
+                  end='\n\n')
+            return
+
         # Format decoded string (prevents empty files on error)
-        formatted = format(raw.decode(chardet.detect(raw)['encoding']))
+        formatted = format(contents)
 
         # Determine output filename
         outfilename = filename
