@@ -116,7 +116,7 @@ def parse(filename, outdir):
                 i += 1
 
         # Create needed directories for this file
-        os.makedirs(os.path.basename(outfilename), exist_ok=True)
+        os.makedirs(os.path.dirname(outfilename), exist_ok=True)
 
         # Write formatted file
         with open(outfilename, 'w') as outfile:
