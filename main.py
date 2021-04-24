@@ -80,7 +80,7 @@ def parse(filename, outdir):
     fileCounter += 1
 
     # number of files over total files and percentage
-    stats = f'{{count: {len(str(fileSum))},}} of {fileSum:,} ({{percent}}%)'
+    stats = f'{{count: >{len(f"{fileSum:,}")},}} of {fileSum:,} ({{percent}}%)'
     stats = stats.format(count=fileCounter,
                          percent=round(fileCounter/fileSum*100)
                          if fileSum != 0 else 0)
