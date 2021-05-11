@@ -168,13 +168,13 @@ def parse(filename, outdir):
 outdir = ''
 if args.out:
     outdir = args.out
+    # If the file already exists and is not a directory, throw error
+    if os.path.exists(outdir) and not os.path.isdir(outdir):
+        raise FileExistsError
+    else:
+        # Otherwise create the dir
+        os.makedirs(outdir, exist_ok=True)
 
-# If the file already exists and is not a directory, throw error
-if os.path.exists(outdir) and not os.path.isdir(outdir):
-    raise FileExistsError
-else:
-    # Otherwise create the dir
-    os.makedirs(outdir, exist_ok=True)
 
 # one empty line to let the cursor move up in the status line
 print()
