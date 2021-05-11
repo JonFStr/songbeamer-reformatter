@@ -16,6 +16,11 @@ argparser.add_argument(
     '-o', '--output-directory', dest='out',
     help='Write files in this output directory \
     instead of overwriting input files. Keeps directory structure')
+# overwrite files in output directory
+argparser.add_argument(
+    '-f', '--overwrite', dest='overwrite', action='store_true',
+    help='Overwrite files in the output directory, if they are already present'
+)
 # Parse the args now to avoid unneeded execution of code
 args = argparser.parse_args()
 
@@ -136,13 +141,15 @@ def parse(filename, outdir):
         if outdir:
             # This file belongs in a subdir
             outfilename = os.path.join(outdir, basename)
-            # If the file already exists in custom outdir, append number
-            i = 1
-            # Pattern to insert number before .sng
-            pattern = outfilename[:-4] + r' ({})' + outfilename[-4:]
-            while os.path.exists(outfilename):
-                outfilename = pattern.format(i)
-                i += 1
+            # If the file already exists in custom outdir
+            # and overwrite is not specified, append number
+            if not args.overwrite:
+                i = 1
+                # Pattern to insert number before .sng
+                pattern = outfilename[:-4] + r' ({})' + outfilename[-4:]
+                while os.path.exists(outfilename):
+                    outfilename = pattern.format(i)
+                    i += 1
 
         # Create needed directories for this file
         os.makedirs(os.path.dirname(outfilename), exist_ok=True)
