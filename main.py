@@ -35,9 +35,11 @@ ctrl_clearLine = '\x1b[K'
 ctrl_moveUp = '\x1b[1A'
 
 
-def verbose(message):
-    if args.verbose:
-        print(message)
+# Log message depending on verbosity & args
+def log(*message, level='l'):
+    if (level != 'l') and (level == 'v' and not args.verbose):
+        return
+    print(ctrl_moveUp, *message, end=ctrl_clearLine+'\n')
 
 
 def cleanup(text):
@@ -97,7 +99,7 @@ def format(text):
 def determine_encoding(raw):
     # Detect all possible encodings and select one from predefined list
     possible_encodings = chardet.detect_all(raw)
-    verbose(possible_encodings)
+    log(possible_encodings, level='v')
 
     # Iterate over found encodings
     for possible_enc in possible_encodings:
@@ -124,8 +126,7 @@ def parse(filename, outdir):
                          if fileSum != 0 else 0)
 
     # print rewriting status line
-    print(ctrl_moveUp + 'Reformatting:', stats, filename,
-          end=ctrl_clearLine+'\n')
+    log('Reformatting:', stats, filename)
 
     # set the basename (not found by function if string ands with /)
     basename = os.path.basename(filename)
@@ -159,7 +160,7 @@ def parse(filename, outdir):
             encoding = determine_encoding(raw)
             contents = raw.decode(encoding)
         except ValueError as err:
-            print('Error decoding file "' + filename + '":', err)
+            log('Error decoding file "' + filename + '":', err)
             return
 
         # Format decoded string (prevents empty files on error)
@@ -186,7 +187,10 @@ def parse(filename, outdir):
 
         # Write formatted file in windows encoding & line ending
         with open(outfilename, 'w', encoding='windows-1252', newline='\r\n') as outfile:
-            outfile.write(formatted)
+            try:
+                outfile.write(formatted)
+            except UnicodeEncodeError as err:
+                log('Error encoding reformatted file "' + outfilename + '":', err)
 
     else:
         raise FileNotFoundError
