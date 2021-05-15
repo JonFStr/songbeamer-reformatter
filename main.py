@@ -149,7 +149,7 @@ def parse(filename, outdir):
 
         # Determine output filename
         outfilename = filename
-        # if custom out is given, put it in there
+        # If custom out is given, put it in there
         if outdir:
             # This file belongs in a subdir
             outfilename = os.path.join(outdir, basename)
@@ -166,8 +166,8 @@ def parse(filename, outdir):
         # Create needed directories for this file
         os.makedirs(os.path.dirname(outfilename), exist_ok=True)
 
-        # Write formatted file
-        with open(outfilename, 'w') as outfile:
+        # Write formatted file in windows encoding & line ending
+        with open(outfilename, 'w', encoding='windows-1252', newline='\r\n') as outfile:
             outfile.write(formatted)
 
     else:
