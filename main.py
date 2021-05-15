@@ -21,12 +21,22 @@ argparser.add_argument(
     '-f', '--overwrite', dest='overwrite', action='store_true',
     help='Overwrite files in the output directory, if they are already present'
 )
+# verbose mode
+argparser.add_argument(
+    '-v', '--verbose', dest='verbose', action='store_true',
+    help='Verbose output'
+)
 # Parse the args now to avoid unneeded execution of code
 args = argparser.parse_args()
 
 # ANSI control sequences
 ctrl_clearLine = '\x1b[K'
 ctrl_moveUp = '\x1b[1A'
+
+
+def verbose(message):
+    if args.verbose:
+        print(message)
 
 
 def cleanup(text):
