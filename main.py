@@ -106,7 +106,7 @@ def determine_encoding(raw):
         # Take encoding from dictionary
         encoding = possible_enc['encoding'].lower()
         # Second loop is necessary because of possible amendments
-        for allowed_enc in ['iso-8859-1', 'windows-1252', 'utf-8', 'ascii']:
+        for allowed_enc in ['iso-8859-1', 'windows-1252', 'utf-8', 'utf-16', 'utf-32', 'ascii']:
             # Check if the found encoding name starts with an allowed one
             if allowed_enc in encoding:
                 return possible_enc['encoding']
