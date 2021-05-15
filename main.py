@@ -90,6 +90,23 @@ def format(text):
     return result
 
 
+def determine_encoding(raw):
+    # Detect all possible encodings and select one from predefined list
+    possible_encodings = chardet.detect_all(raw)
+    verbose(possible_encodings)
+
+    # Iterate over found encodings
+    for possible_enc in possible_encodings:
+        # Take encoding from dictionary
+        encoding = possible_enc['encoding'].lower()
+        # Second loop is necessary because of possible amendments
+        for allowed_enc in ['iso-8859-1', 'windows-1252', 'utf-8', 'ascii']:
+            # Check if the found encoding name starts with an allowed one
+            if allowed_enc in encoding:
+                return possible_enc['encoding']
+    raise ValueError('Cannot detect matching encoding')
+
+
 def parse(filename, outdir):
     global fileCounter, fileSum
 
@@ -135,13 +152,10 @@ def parse(filename, outdir):
 
         # decode string
         try:
-            encoding = chardet.detect(raw)['encoding']
-            if not encoding:
-                raise ValueError('Cannot detect matching encoding')
+            encoding = determine_encoding(raw)
             contents = raw.decode(encoding)
         except ValueError as err:
-            print(ctrl_moveUp + 'Error decoding file "' + filename + '":', err,
-                  end='\n\n')
+            print('Error decoding file "' + filename + '":', err)
             return
 
         # Format decoded string (prevents empty files on error)
