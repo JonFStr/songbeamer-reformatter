@@ -2,6 +2,7 @@ import argparse
 import os
 import re
 import chardet
+import unicodedata
 
 # Parsing CMD arguments
 argparser = argparse.ArgumentParser(
@@ -52,6 +53,9 @@ def cleanup(text):
     result = re.sub(r'\n---\n---\n', r'\n---\n', result)
     # Remove slide seperator at eof
     result = re.sub(r'\n---\n$', r'\n', result)
+    # Replace Unicode sequences (i.e. a + ̈  = ̈a)
+    # with their legacy equivalent (i.e. ä)
+    result = unicodedata.normalize('NFC', result)
     return result
 
 
