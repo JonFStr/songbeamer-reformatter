@@ -39,7 +39,7 @@ ctrl_moveUp = '\x1b[1A'
 def log(*message, level='l'):
     if (level != 'l') and (level == 'v' and not args.verbose):
         return
-    print(ctrl_moveUp, *message, end=ctrl_clearLine+'\n')
+    print(ctrl_moveUp + message[0], *message[1:], end=ctrl_clearLine+'\n\n')
 
 
 def cleanup(text):
@@ -126,7 +126,8 @@ def parse(filename, outdir):
                          if fileSum != 0 else 0)
 
     # print rewriting status line
-    log('Reformatting:', stats, filename)
+    print(ctrl_moveUp + 'Reformatting:', stats, filename,
+          end=ctrl_clearLine + '\n')
 
     # set the basename (not found by function if string ands with /)
     basename = os.path.basename(filename)
@@ -159,7 +160,7 @@ def parse(filename, outdir):
         try:
             encoding = determine_encoding(raw)
             contents = raw.decode(encoding)
-        except ValueError as err:
+        except (ValueError, AttributeError) as err:
             log('Error decoding file "' + filename + '":', err)
             return
 
