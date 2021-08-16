@@ -64,7 +64,7 @@ def cleanup(text):
 def formatLine(line):
     # Make character at line start uppercase
     # Line start to upper case
-    line = re.sub(r'^\s*(#\d\s+)?([a-z])',
+    line = re.sub(r'^\s*(#{1,2}\d\s+)?([a-z])',
                   lambda mobj: mobj.group(2).upper(), line)
     # Remove backslashes
     line = line.replace('\\', '')
